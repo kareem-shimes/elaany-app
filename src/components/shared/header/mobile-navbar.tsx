@@ -4,10 +4,9 @@ import {
   SheetContent,
   SheetHeader,
   SheetTrigger,
-  SheetClose,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { MenuIcon, X } from "lucide-react";
+import { MenuIcon } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import Link from "@/components/ui/link";
 import { Routes } from "@/constants/enums";
