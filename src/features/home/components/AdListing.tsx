@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Ad } from "@/types";
 import { MapPin, Clock } from "lucide-react";
 import Image from "next/image";
@@ -10,59 +10,83 @@ interface AdCardProps {
 }
 
 function AdCard({ ad }: AdCardProps) {
+  // helper to get seller initials when no image
+  const getInitials = (name: string) => {
+    if (!name) return "?";
+    const parts = name.split(" ").filter(Boolean);
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  };
+
+  const sellerImage = ad.sellerImage;
+
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-all duration-200 group">
-      <CardHeader className="p-0">
-        <div className="relative overflow-hidden">
-          <div className="h-48 bg-gray-200 flex items-center justify-center">
-            {ad.image ? (
-              <Image
-                src={ad.image}
-                alt={ad.title}
-                width={300}
-                height={200}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-              />
-            ) : (
-              <span className="text-gray-500">صورة الإعلان</span>
-            )}
-          </div>
-
-          {/* overlays only (no badges or action buttons) */}
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200" />
+    <Card className="overflow-hidden hover:shadow-lg transition-all duration-200 group relative">
+      <div className="flex items-start gap-4 p-4">
+        {/* Image */}
+        <div className="w-36 h-24 flex-shrink-0 rounded overflow-hidden bg-gray-200">
+          {ad.image ? (
+            <Image
+              src={ad.image}
+              alt={ad.title}
+              width={144}
+              height={96}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full text-gray-500">
+              صورة الإعلان
+            </div>
+          )}
         </div>
-      </CardHeader>
 
-      <CardContent className="p-4">
-        <div className="space-y-2">
-          {/* Title and Description */}
-          <div>
-            <h3 className="text-lg font-semibold line-clamp-2 mb-1 group-hover:text-primary transition-colors">
-              {ad.title}
-            </h3>
-            <p className="text-sm text-muted-foreground line-clamp-2">
-              {ad.description}
-            </p>
-          </div>
+        {/* Text / Meta */}
+        <div className="flex-1 min-w-0">
+          <h3 className="text-base md:text-lg font-semibold line-clamp-2 mb-1 group-hover:text-primary transition-colors">
+            {ad.title}
+          </h3>
+          <p className="hidden md:block text-sm text-muted-foreground line-clamp-2">
+            {ad.description}
+          </p>
 
-          {/* Location and Date */}
-          <div className="space-y-1 text-sm text-muted-foreground">
+          <div className="mt-3 flex flex-wrap items-center gap-2 md:gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-1">
               <MapPin className="h-3 w-3 flex-shrink-0" />
-              <span className="truncate">{ad.location}</span>
+              <span className="truncate max-w-[10rem] sm:max-w-xs">
+                {ad.location}
+              </span>
             </div>
+
             <div className="flex items-center gap-1">
               <Clock className="h-3 w-3 flex-shrink-0" />
               <span>{ad.postedDate}</span>
             </div>
-          </div>
 
-          {/* Seller */}
-          <div className="pt-2">
-            <span className="text-sm text-muted-foreground">{ad.seller}</span>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-200 flex-shrink-0 flex items-center justify-center text-xs font-medium text-muted-foreground">
+                {sellerImage ? (
+                  <Image
+                    src={sellerImage}
+                    alt={ad.seller}
+                    width={32}
+                    height={32}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span>{getInitials(ad.seller)}</span>
+                )}
+              </div>
+
+              <span className="text-sm text-muted-foreground truncate">
+                {ad.seller}
+              </span>
+            </div>
           </div>
         </div>
-      </CardContent>
+      </div>
+
+      {/* subtle overlay on hover */}
+      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200 pointer-events-none" />
     </Card>
   );
 }
@@ -115,7 +139,7 @@ export default function AdListing({ ads, loading, hasMore }: AdListingProps) {
 
   return (
     <div className="container py-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         {ads.map((ad) => (
           <AdCard key={ad.id} ad={ad} />
         ))}

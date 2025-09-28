@@ -35,13 +35,13 @@ export default function AdSearchBar({
   };
 
   return (
-    <div className="flex items-center rounded-md overflow-hidden flex-1 max-w-4xl h-10 relative ">
+    <div className="flex items-center rounded-md overflow-hidden flex-1 max-w-4xl h-12 relative ">
       <Input
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         onKeyPress={handleKeyPress}
         placeholder={placeholder}
-        className="border border-border border-l-0 !rounded-l-none pr-4 "
+        className="border border-border border-l-0 !rounded-l-none pr-4"
       />
       {searchQuery && (
         <button
@@ -54,7 +54,7 @@ export default function AdSearchBar({
       )}
       <Button
         size="lg"
-        className="rounded-tr-none rounded-br-none"
+        className="rounded-tr-none rounded-br-none h-full"
         onClick={handleSearch}
       >
         <SearchIcon className="h-4 w-4" />

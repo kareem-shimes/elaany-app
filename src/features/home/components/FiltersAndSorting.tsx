@@ -5,11 +5,9 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Separator } from "@/components/ui/separator";
-import { Filter, SortAsc, MapPin, DollarSign, Clock, Star } from "lucide-react";
+import { SortAsc, MapPin, DollarSign, Star } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 
@@ -19,8 +17,6 @@ export interface FilterOptions {
     max?: number;
   };
   location: string[];
-  condition: string[];
-  featured: boolean;
 }
 
 export interface SortOption {
@@ -29,25 +25,11 @@ export interface SortOption {
   icon?: React.ReactNode;
 }
 
-interface FiltersAndSortingProps {
-  totalResults: number;
-}
-
 const sortOptions: SortOption[] = [
   {
     label: "تلقائي",
     value: "auto",
     icon: <SortAsc className="h-4 w-4 text-inherit group-hover:text-white" />,
-  },
-  {
-    label: "الأحدث",
-    value: "newest",
-    icon: <Clock className="h-4 w-4 text-inherit group-hover:text-white" />,
-  },
-  {
-    label: "الأقدم",
-    value: "oldest",
-    icon: <Clock className="h-4 w-4 text-inherit group-hover:text-white" />,
   },
   {
     label: "السعر: من الأقل للأعلى",
@@ -78,30 +60,45 @@ const priceRanges = [
   { label: "أكثر من 10000 ر.س", min: 10000, max: undefined },
 ];
 
-const locations = [
-  "الرياض",
-  "جدة",
-  "الدمام",
-  "مكة المكرمة",
-  "المدينة المنورة",
-  "الخبر",
-  "تبوك",
-  "أبها",
-];
+const countries = {
+  السعودية: [
+    "الرياض",
+    "جدة",
+    "الدمام",
+    "مكة المكرمة",
+    "المدينة المنورة",
+    "الخبر",
+    "تبوك",
+    "أبها",
+    "الطائف",
+    "بريدة",
+    "خميس مشيط",
+    "الهفوف",
+  ],
+  الإمارات: [
+    "دبي",
+    "أبو ظبي",
+    "الشارقة",
+    "العين",
+    "عجمان",
+    "رأس الخيمة",
+    "الفجيرة",
+    "أم القيوين",
+  ],
+  الكويت: ["الكويت", "الأحمدي", "حولي", "الفروانية", "مبارك الكبير", "الجهراء"],
+  قطر: ["الدوحة", "الريان", "الوكرة", "أم صلال", "الخور", "الدعين"],
+  البحرين: ["المنامة", "المحرق", "الرفاع", "مدينة حمد", "مدينة عيسى", "سترة"],
+  عمان: ["مسقط", "صلالة", "نزوى", "صحار", "الرستاق", "صور"],
+};
 
-const conditions = ["جديد", "ممتاز", "جيد جداً", "جيد", "مقبول"];
-
-export default function FiltersAndSorting({
-  totalResults,
-}: FiltersAndSortingProps) {
+export default function FiltersAndSorting() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   // Get current values from URL
   const currentSort = searchParams.get("sortBy") || "auto";
   const currentLocations = searchParams.getAll("location");
-  const currentConditions = searchParams.getAll("condition");
-  const currentFeatured = searchParams.get("featured") === "true";
+  const currentCountries = searchParams.getAll("country");
   const currentMinPrice = searchParams.get("minPrice");
   const currentMaxPrice = searchParams.get("maxPrice");
 
@@ -111,8 +108,7 @@ export default function FiltersAndSorting({
 
   const hasActiveFilters =
     currentLocations.length > 0 ||
-    currentConditions.length > 0 ||
-    currentFeatured ||
+    currentCountries.length > 0 ||
     currentMinPrice ||
     currentMaxPrice;
 
@@ -138,23 +134,52 @@ export default function FiltersAndSorting({
   );
 
   const handleLocationToggle = (location: string) => {
-    const newLocations = currentLocations.includes(location)
-      ? currentLocations.filter((l: string) => l !== location)
-      : [...currentLocations, location];
+    if (location === "الكل") {
+      // If selecting "الكل", replace all previous city selections
+      updateSearchParams({
+        location: ["الكل"],
+      });
+    } else {
+      // If selecting a specific city, remove "الكل" if it exists
+      let newLocations = currentLocations.filter((l) => l !== "الكل");
 
-    updateSearchParams({
-      location: newLocations.length > 0 ? newLocations : null,
-    });
+      if (newLocations.includes(location)) {
+        // Remove the location if it's already selected
+        newLocations = newLocations.filter((l: string) => l !== location);
+      } else {
+        // Add the location
+        newLocations = [...newLocations, location];
+      }
+
+      updateSearchParams({
+        location: newLocations.length > 0 ? newLocations : null,
+      });
+    }
   };
 
-  const handleConditionToggle = (condition: string) => {
-    const newConditions = currentConditions.includes(condition)
-      ? currentConditions.filter((c: string) => c !== condition)
-      : [...currentConditions, condition];
+  const handleCountryToggle = (country: string) => {
+    if (country === "كل المناطق") {
+      // If selecting "كل المناطق", replace all previous selections
+      updateSearchParams({
+        country: ["كل المناطق"],
+        location: null, // Clear city selections when selecting all regions
+      });
+    } else {
+      // If selecting a specific country, remove "كل المناطق" if it exists
+      let newCountries = currentCountries.filter((c) => c !== "كل المناطق");
 
-    updateSearchParams({
-      condition: newConditions.length > 0 ? newConditions : null,
-    });
+      if (newCountries.includes(country)) {
+        // Remove the country if it's already selected
+        newCountries = newCountries.filter((c: string) => c !== country);
+      } else {
+        // Add the country
+        newCountries = [...newCountries, country];
+      }
+
+      updateSearchParams({
+        country: newCountries.length > 0 ? newCountries : null,
+      });
+    }
   };
 
   const handlePriceRangeSelect = (range: (typeof priceRanges)[0]) => {
@@ -168,84 +193,180 @@ export default function FiltersAndSorting({
     updateSearchParams({ sortBy: sortValue });
   };
 
-  const handleFeaturedToggle = () => {
-    updateSearchParams({ featured: currentFeatured ? null : "true" });
-  };
-
   const handleClearFilters = () => {
     updateSearchParams({
       location: null,
-      condition: null,
-      featured: null,
+      country: null,
       minPrice: null,
       maxPrice: null,
     });
   };
 
+  const getCurrentPriceLabel = () => {
+    if (!currentMinPrice && !currentMaxPrice) return "السعر";
+    const range = priceRanges.find(
+      (r) =>
+        r.min.toString() === currentMinPrice &&
+        (r.max?.toString() === currentMaxPrice || (!r.max && !currentMaxPrice))
+    );
+    return range
+      ? range.label
+      : `${currentMinPrice || 0} - ${currentMaxPrice || "∞"} ر.س`;
+  };
+
+  const getCurrentCountryLabel = () => {
+    if (currentCountries.length === 0) return "الدولة";
+    if (currentCountries.length === 1) return currentCountries[0];
+    return `${currentCountries.length} دول`;
+  };
+
+  const getCurrentCityLabel = () => {
+    if (currentLocations.length === 0) return "المدينة";
+    if (currentLocations.length === 1) return currentLocations[0];
+    return `${currentLocations.length} مدن`;
+  };
+
+  // Get available cities based on selected countries
+  const getAvailableCities = () => {
+    if (
+      currentCountries.length === 0 ||
+      currentCountries.includes("كل المناطق")
+    ) {
+      return []; // Don't show cities if no country selected or "كل المناطق" is selected
+    }
+    let cities: string[] = [];
+    currentCountries.forEach((country) => {
+      if (countries[country as keyof typeof countries]) {
+        cities = [...cities, ...countries[country as keyof typeof countries]];
+      }
+    });
+    return [...new Set(cities)]; // Remove duplicates
+  };
+
   return (
     <div className="bg-background border-b border-border">
       <div className="container py-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          {/* Results Count */}
-          <div className="text-sm text-muted-foreground">
-            عرض {totalResults.toLocaleString()} إعلان
-          </div>
-
-          {/* Filters and Sort */}
-          <div className="flex items-center gap-3">
-            {/* Active Filters Display */}
-            {hasActiveFilters && (
-              <div className="flex items-center gap-2">
-                <div className="flex flex-wrap gap-1">
-                  {currentLocations.map((location: string) => (
-                    <Badge
-                      key={location}
-                      variant="secondary"
-                      className="text-xs"
-                    >
-                      {location}
-                    </Badge>
-                  ))}
-                  {currentConditions.map((condition: string) => (
-                    <Badge
-                      key={condition}
-                      variant="secondary"
-                      className="text-xs"
-                    >
-                      {condition}
-                    </Badge>
-                  ))}
-                  {currentFeatured && (
-                    <Badge variant="secondary" className="text-xs">
-                      مميز
-                    </Badge>
-                  )}
-                  {(currentMinPrice || currentMaxPrice) && (
-                    <Badge variant="secondary" className="text-xs">
-                      {currentMinPrice || 0} - {currentMaxPrice || "∞"} ر.س
-                    </Badge>
-                  )}
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleClearFilters}
-                  className="text-xs h-6 px-2"
-                >
-                  مسح الكل
-                </Button>
-              </div>
-            )}
-
-            <Separator orientation="vertical" className="h-6" />
-
-            {/* Filters Dropdown */}
+        {/* Filters and Sort */}
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          {/* Filters */}
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Country Filter */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="gap-2">
-                  <Filter className="h-4 w-4" />
-                  فلترة
-                  {hasActiveFilters && (
+                  <MapPin className="h-4 w-4" />
+                  {getCurrentCountryLabel()}
+                  {currentCountries.length > 0 && (
+                    <Badge
+                      variant="destructive"
+                      className="text-xs px-1 py-0 ml-1"
+                    >
+                      {currentCountries.length}
+                    </Badge>
+                  )}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-48">
+                <div className="p-2">
+                  <DropdownMenuItem
+                    onClick={() => handleCountryToggle("كل المناطق")}
+                    className={`text-sm ${
+                      currentCountries.includes("كل المناطق")
+                        ? "bg-accent text-white"
+                        : ""
+                    }`}
+                  >
+                    كل المناطق
+                    {currentCountries.includes("كل المناطق") && (
+                      <span className="ml-auto">✓</span>
+                    )}
+                  </DropdownMenuItem>
+                  {Object.keys(countries).map((country) => (
+                    <DropdownMenuItem
+                      key={country}
+                      onClick={() => handleCountryToggle(country)}
+                      className={`text-sm ${
+                        currentCountries.includes(country)
+                          ? "bg-accent text-white"
+                          : ""
+                      }`}
+                    >
+                      {country}
+                      {currentCountries.includes(country) && (
+                        <span className="ml-auto">✓</span>
+                      )}
+                    </DropdownMenuItem>
+                  ))}
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* City Filter - Show only if specific countries are selected (not "كل المناطق") */}
+            {((currentCountries.length > 0 &&
+              !currentCountries.includes("كل المناطق") &&
+              getAvailableCities().length > 0) ||
+              currentLocations.length > 0) && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <MapPin className="h-4 w-4" />
+                    {getCurrentCityLabel()}
+                    {currentLocations.length > 0 && (
+                      <Badge
+                        variant="destructive"
+                        className="text-xs px-1 py-0 ml-1"
+                      >
+                        {currentLocations.length}
+                      </Badge>
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="start"
+                  className="w-48 max-h-64 overflow-y-auto"
+                >
+                  <div className="p-2">
+                    <DropdownMenuItem
+                      onClick={() => handleLocationToggle("الكل")}
+                      className={`text-sm ${
+                        currentLocations.includes("الكل")
+                          ? "bg-accent text-white"
+                          : ""
+                      }`}
+                    >
+                      الكل
+                      {currentLocations.includes("الكل") && (
+                        <span className="ml-auto">✓</span>
+                      )}
+                    </DropdownMenuItem>
+                    {getAvailableCities().map((city) => (
+                      <DropdownMenuItem
+                        key={city}
+                        onClick={() => handleLocationToggle(city)}
+                        className={`text-sm ${
+                          currentLocations.includes(city)
+                            ? "bg-accent text-white"
+                            : ""
+                        }`}
+                      >
+                        {city}
+                        {currentLocations.includes(city) && (
+                          <span className="ml-auto">✓</span>
+                        )}
+                      </DropdownMenuItem>
+                    ))}
+                  </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
+            {/* Price Range Filter */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <DollarSign className="h-4 w-4" />
+                  {getCurrentPriceLabel()}
+                  {(currentMinPrice || currentMaxPrice) && (
                     <Badge
                       variant="destructive"
                       className="text-xs px-1 py-0 ml-1"
@@ -255,13 +376,8 @@ export default function FiltersAndSorting({
                   )}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-64">
-                {/* Price Range */}
+              <DropdownMenuContent align="start" className="w-64">
                 <div className="p-2">
-                  <h4 className="font-medium mb-2 text-sm flex items-center gap-2">
-                    <DollarSign className="h-4 w-4" />
-                    نطاق السعر
-                  </h4>
                   {priceRanges.map((range, index) => {
                     const isSelected =
                       currentMinPrice &&
@@ -284,108 +400,53 @@ export default function FiltersAndSorting({
                     );
                   })}
                 </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-                <DropdownMenuSeparator />
+            {/* Clear Filters */}
+            {hasActiveFilters && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleClearFilters}
+                className="text-xs px-2"
+              >
+                مسح الكل
+              </Button>
+            )}
+          </div>
 
-                {/* Location */}
-                <div className="p-2">
-                  <h4 className="font-medium mb-2 text-sm flex items-center gap-2">
-                    <MapPin className="h-4 w-4" />
-                    المدينة
-                  </h4>
-                  {locations.map((location) => (
-                    <DropdownMenuItem
-                      key={location}
-                      onClick={() => handleLocationToggle(location)}
-                      className={`text-sm ${
-                        currentLocations.includes(location)
-                          ? "bg-accent text-white"
-                          : ""
-                      }`}
-                    >
-                      {location}
-                      {currentLocations.includes(location) && (
-                        <span className="ml-auto">✓</span>
-                      )}
-                    </DropdownMenuItem>
-                  ))}
-                </div>
-
-                <DropdownMenuSeparator />
-
-                {/* Condition */}
-                <div className="p-2">
-                  <h4 className="font-medium mb-2 text-sm">الحالة</h4>
-                  {conditions.map((condition) => (
-                    <DropdownMenuItem
-                      key={condition}
-                      onClick={() => handleConditionToggle(condition)}
-                      className={`text-sm ${
-                        currentConditions.includes(condition)
-                          ? "bg-accent text-white"
-                          : ""
-                      }`}
-                    >
-                      {condition}
-                      {currentConditions.includes(condition) && (
-                        <span className="ml-auto">✓</span>
-                      )}
-                    </DropdownMenuItem>
-                  ))}
-                </div>
-
-                <DropdownMenuSeparator />
-
-                {/* Featured */}
+          {/* Sort Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-2">
+                {selectedSortOption?.icon || <SortAsc className="h-4 w-4" />}
+                ترتيب: {selectedSortOption?.label || "تلقائي"}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {sortOptions.map((option) => (
                 <DropdownMenuItem
-                  onClick={handleFeaturedToggle}
-                  className={`text-sm ${
-                    currentFeatured ? "bg-accent text-white" : ""
+                  key={option.value}
+                  onClick={() => handleSortChange(option.value)}
+                  className={`gap-2 group ${
+                    currentSort === option.value ? "bg-accent text-white" : ""
                   }`}
                 >
-                  <Star
-                    className={`h-4 w-4 ml-2 ${
-                      currentFeatured ? "text-white" : ""
-                    }`}
-                  />
-                  إعلانات مميزة فقط
-                  {currentFeatured && <span className="ml-auto">✓</span>}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {/* Sort Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2">
-                  {selectedSortOption?.icon || <SortAsc className="h-4 w-4" />}
-                  ترتيب: {selectedSortOption?.label || "تلقائي"}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {sortOptions.map((option) => (
-                  <DropdownMenuItem
-                    key={option.value}
-                    onClick={() => handleSortChange(option.value)}
-                    className={`gap-2 group ${
-                      currentSort === option.value ? "bg-accent text-white" : ""
+                  <span
+                    className={`group-hover:text-white ${
+                      currentSort === option.value
+                        ? "text-white"
+                        : "text-muted-foreground"
                     }`}
                   >
-                    <span
-                      className={`group-hover:text-white ${
-                        currentSort === option.value
-                          ? "text-white"
-                          : "text-muted-foreground"
-                      }`}
-                    >
-                      {option.icon}
-                    </span>
-                    {option.label}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+                    {option.icon}
+                  </span>
+                  {option.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </div>

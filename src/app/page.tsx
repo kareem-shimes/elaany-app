@@ -11,7 +11,7 @@ export default function Home() {
       <AdsToolbar />
       <CategorySlider />
       <Suspense fallback={<div>Loading filters...</div>}>
-        <FiltersAndSorting totalResults={10} />
+        <FiltersAndSorting />
       </Suspense>
       <AdListing ads={mockAds} hasMore={false} />
     </main>

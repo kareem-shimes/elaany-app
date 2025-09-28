@@ -31,6 +31,7 @@ export interface Ad {
   images?: string[];
   postedDate: string;
   seller: string;
+  sellerImage?: string;
   sellerId: string;
   featured: boolean;
   condition: string;

@@ -4,6 +4,7 @@ import { PlusIcon } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import Link from "@/components/ui/link";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 export default function AdsToolbar() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -25,7 +26,10 @@ export default function AdsToolbar() {
           placeholder="ابحث عن سلعة، خدمة، عقار..."
         />
       </div>
-      <Link href="/add-ad" className={buttonVariants({ size: "lg" })}>
+      <Link
+        href="/add-ad"
+        className={cn(buttonVariants({ size: "lg" }), "md:h-12")}
+      >
         انشر إعلانك
         <PlusIcon className="ml-2 h-4 w-4" />
       </Link>
