@@ -54,9 +54,10 @@ jobs:
       - name: Build application
         run: npm run build
         env:
-          # Add your environment variables here
-          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-          NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
+          # Hardcoded values for testing - REMOVE AFTER TESTING!
+          NEXTAUTH_SECRET: "Kmo08F5rO40134hP0OFo8BZmqdzIliiSLiJdw/SlzyU="
+          NEXTAUTH_URL: "https://ealaany.com"
+          NODE_ENV: production
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
