@@ -101,9 +101,9 @@ jobs:
             # Install dependencies
             npm ci
 
-            # Set environment variables
-            export NEXTAUTH_SECRET="${{ secrets.NEXTAUTH_SECRET }}"
-            export NEXTAUTH_URL="${{ secrets.NEXTAUTH_URL }}"
+            # # Set environment variables
+            # export NEXTAUTH_SECRET="${{ secrets.NEXTAUTH_SECRET }}"
+            # export NEXTAUTH_URL="${{ secrets.NEXTAUTH_URL }}"
 
             # Build the application
             npm run build
