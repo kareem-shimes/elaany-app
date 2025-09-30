@@ -100,11 +100,15 @@ jobs:
           port: 22
           script: |
             cd /home/kareem/elaany-app
+            # Reset any local changes
+            git reset --hard
+            git clean -fd
+
             git pull origin main
             npm ci
             export NEXTAUTH_SECRET="Kmo08F5rO40134hP0OFo8BZmqdzIliiSLiJdw/SlzyU="
             export NEXTAUTH_URL="https://ealaany.com"
             npm run build
-            pm2 restart elaany-app || pm2 start npm --name "elaany-app" -- start
+            pm2 restart nextjs-app || pm2 start npm --name "nextjs-app" -- start
             pm2 save
             echo "✅ Deployment completed successfully!"
