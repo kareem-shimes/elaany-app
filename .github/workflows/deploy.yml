@@ -54,7 +54,6 @@ jobs:
       - name: Build application
         run: npm run build
         env:
-          # Hardcoded values for testing - REMOVE AFTER TESTING!
           NEXTAUTH_SECRET: "Kmo08F5rO40134hP0OFo8BZmqdzIliiSLiJdw/SlzyU="
           NEXTAUTH_URL: "https://ealaany.com"
           NODE_ENV: production
@@ -69,7 +68,6 @@ jobs:
             package.json
             package-lock.json
 
-  # VPS Server deployment
   deploy-vps:
     name: Deploy to VPS Server
     runs-on: ubuntu-latest
@@ -88,31 +86,25 @@ jobs:
       - name: Deploy to VPS Server
         uses: appleboy/ssh-action@v1.2.0
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_PRIVATE_KEY }}
-          port: ${{ secrets.VPS_PORT }}
+          host: "92.112.192.245"
+          username: "kareem"
+          key: |
+            -----BEGIN OPENSSH PRIVATE KEY-----
+            b3BlbnNzaC1rZXktdjEAAAAACmFlczI1Ni1jdHIAAAAGYmNyeXB0AAAAGAAAABBhf3SIEn
+            qLfTBxGsh4DjMxAAAAGAAAAAEAAAAzAAAAC3NzaC1lZDI1NTE5AAAAIDOouAei+mN4I30F
+            gTHlAepf8rXi8D/AI9AezCJw4ygkAAAAoGv0I0gAw/x4nOQg6jGuQWJU6+TYociNJfHSwd
+            OtEh1yoS747lbGxVDZpTWsDnDqIdMWxVUNr4gFMO/Bu6h4Em0aOaWeGu5SjMS4rDxdhmY3
+            p61hLWh67x6c4n07H+QxNYVjLjc2gLUB8q0SkeondpUp+VFoRkh5Wp7VoTxckpXonvsoqD
+            lH3C6SF2IlMrH3pIKTGUXGQTi8bSRF7S0pAsw=
+            -----END OPENSSH PRIVATE KEY-----
+          port: 22
           script: |
-            # Navigate to app directory
-            cd ${{ secrets.VPS_APP_PATH }}
-
-            # Pull latest changes
+            cd /home/kareem/elaany-app
             git pull origin main
-
-            # Install dependencies
             npm ci
-
-            # Set environment variables
             export NEXTAUTH_SECRET="Kmo08F5rO40134hP0OFo8BZmqdzIliiSLiJdw/SlzyU="
             export NEXTAUTH_URL="https://ealaany.com"
-
-            # Build the application
             npm run build
-
-            # Restart the application with PM2
             pm2 restart elaany-app || pm2 start npm --name "elaany-app" -- start
-
-            # Save PM2 configuration
             pm2 save
-
             echo "✅ Deployment completed successfully!"
