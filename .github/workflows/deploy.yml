@@ -90,13 +90,13 @@ jobs:
           username: "kareem"
           key: |
             -----BEGIN OPENSSH PRIVATE KEY-----
-            b3BlbnNzaC1rZXktdjEAAAAACmFlczI1Ni1jdHIAAAAGYmNyeXB0AAAAGAAAABBhf3SIEn
-            qLfTBxGsh4DjMxAAAAGAAAAAEAAAAzAAAAC3NzaC1lZDI1NTE5AAAAIDOouAei+mN4I30F
-            gTHlAepf8rXi8D/AI9AezCJw4ygkAAAAoGv0I0gAw/x4nOQg6jGuQWJU6+TYociNJfHSwd
-            OtEh1yoS747lbGxVDZpTWsDnDqIdMWxVUNr4gFMO/Bu6h4Em0aOaWeGu5SjMS4rDxdhmY3
-            p61hLWh67x6c4n07H+QxNYVjLjc2gLUB8q0SkeondpUp+VFoRkh5Wp7VoTxckpXonvsoqD
-            lH3C6SF2IlMrH3pIKTGUXGQTi8bSRF7S0pAsw=
-            -----END OPENSSH PRIVATE KEY-----
+             b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
+             QyNTUxOQAAACB18E4FcMcWaD2V9JR/fYGW4dm90rl1cBkSe6JDcUtF0wAAAKhXVZlBV1WZ
+             QQAAAAtzc2gtZWQyNTUxOQAAACB18E4FcMcWaD2V9JR/fYGW4dm90rl1cBkSe6JDcUtF0w
+             AAAECxEmBMlPHWpkm//Gx9cIA/GdxpIspm3P8bHp2kueaWBHXwTgVwxxZoPZX0lH99gZbh
+             2b3SuXVwGRJ7okNxS0XTAAAAH2thcmVlbUBNYWNCb29rLUFpci1LYXJlZW0ubG9jYWwBAg
+             MEBQY=
+             -----END OPENSSH PRIVATE KEY-----
           port: 22
           script: |
             cd /home/kareem/elaany-app
