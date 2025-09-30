@@ -2,6 +2,8 @@ import { Cairo } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/shared/header";
 import { Directions, Languages } from "@/constants/enums";
+import Footer from "@/components/shared/footer";
+import { AuthProvider } from "@/providers/auth-provider";
 
 const cairo = Cairo({
   subsets: ["latin"],
@@ -24,8 +26,11 @@ export default function RootLayout({
   return (
     <html lang={Languages.ARABIC} dir={Directions.RTL}>
       <body className={`${cairo.variable} antialiased`}>
-        <Header />
-        {children}
+        <AuthProvider>
+          <Header />
+          {children}
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );

@@ -5,6 +5,8 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [{ protocol: "https", hostname: "**" }],
   },
+  // Enable standalone output for Docker deployment
+  output: "standalone",
 };
 
 export default nextConfig;

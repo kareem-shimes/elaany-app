@@ -34,7 +34,11 @@ function HoverDropdownTrigger({
   return (
     <div
       data-slot="hover-dropdown-trigger"
-      className={cn("element-center", className)}
+      className={cn(
+        "element-center cursor-pointer touch-manipulation",
+        className
+      )}
+      tabIndex={0}
       {...props}
     />
   );
@@ -60,7 +64,13 @@ function HoverDropdownContent({
     <div
       data-slot="hover-dropdown-content"
       className={cn(
-        "absolute top-full z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200",
+        "absolute top-full z-50 opacity-0 invisible transition-all duration-200",
+        // Desktop hover
+        "group-hover:opacity-100 group-hover:visible",
+        // Mobile/Touch support - focus-within for keyboard navigation and active for touch
+        "group-focus-within:opacity-100 group-focus-within:visible",
+        // Additional mobile touch support using active state
+        "group-active:opacity-100 group-active:visible",
         alignmentClasses[align]
       )}
       style={{ paddingTop: `${sideOffset}px` }}
