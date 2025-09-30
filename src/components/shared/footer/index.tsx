@@ -6,7 +6,6 @@ import {
   Mail,
   Shield,
   Phone,
-  MapPin,
   Calendar,
   Truck,
   RotateCcw,
