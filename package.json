@@ -6,10 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint",
-    "seed:categories": "tsx scripts/seed-categories.ts",
-    "seed:ads": "tsx scripts/seed-ads.ts",
-    "view:ads": "tsx scripts/view-ads.ts"
+    "lint": "eslint"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",
