@@ -124,19 +124,21 @@ export default async function AdPage({ params }: AdPageProps) {
                 </div>
                 {ad.images && ad.images.length > 1 && (
                   <div className="grid grid-cols-5 gap-2 mt-4">
-                    {ad.images.slice(1, 6).map((image: string, index) => (
-                      <div
-                        key={index}
-                        className="aspect-square relative bg-gray-100 rounded overflow-hidden"
-                      >
-                        <Image
-                          src={image}
-                          alt={`${ad.title} - صورة ${index + 2}`}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                    ))}
+                    {ad.images
+                      .slice(1, 6)
+                      .map((image: string, index: number) => (
+                        <div
+                          key={index}
+                          className="aspect-square relative bg-gray-100 rounded overflow-hidden"
+                        >
+                          <Image
+                            src={image}
+                            alt={`${ad.title} - صورة ${index + 2}`}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                      ))}
                   </div>
                 )}
               </CardContent>
