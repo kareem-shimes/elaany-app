@@ -128,17 +128,19 @@ export async function GET(request: NextRequest) {
     });
 
     // Add category suggestions
-    categorySuggestions.forEach((category) => {
-      if (!suggestions.includes(category.name)) {
-        suggestions.push(category.name);
-      }
-      // Add subcategory suggestions
-      category.subcategories.forEach((sub) => {
-        if (!suggestions.includes(sub.name)) {
-          suggestions.push(sub.name);
+    categorySuggestions.forEach(
+      (category: { name: string; subcategories: { name: string }[] }) => {
+        if (!suggestions.includes(category.name)) {
+          suggestions.push(category.name);
         }
-      });
-    });
+        // Add subcategory suggestions
+        category.subcategories.forEach((sub: { name: string }) => {
+          if (!suggestions.includes(sub.name)) {
+            suggestions.push(sub.name);
+          }
+        });
+      }
+    );
 
     // Transform ads data
     const transformedAds = recentAds.map((ad) => ({
