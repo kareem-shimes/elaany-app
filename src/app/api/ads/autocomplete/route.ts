@@ -121,7 +121,7 @@ export async function GET(request: NextRequest) {
     const suggestions: string[] = [];
 
     // Add ad title suggestions
-    adSuggestions.forEach((ad) => {
+    adSuggestions.forEach((ad: { title: string }) => {
       if (!suggestions.includes(ad.title)) {
         suggestions.push(ad.title);
       }
