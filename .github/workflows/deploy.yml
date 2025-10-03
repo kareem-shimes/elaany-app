@@ -99,16 +99,28 @@ jobs:
             -----END OPENSSH PRIVATE KEY-----
           port: 22
           script: |
-            cd /home/kareem/elaany-app
-            # Reset any local changes
-            git reset --hard
-            git clean -fd
+            # Check if repository exists, if not clone it
+            if [ ! -d "/home/kareem/elaany-app" ]; then
+              echo "🔄 Repository not found, cloning..."
+              cd /home/kareem
+              git clone https://github.com/kareem-shimes/elaany-app.git
+              cd elaany-app
+            else
+              echo "🔄 Repository exists, pulling latest changes..."
+              cd /home/kareem/elaany-app
+              # Reset any local changes
+              git reset --hard
+              git clean -fd
+              git pull origin main
+            fi
 
-            git pull origin main
+            # Install dependencies and build
             npm ci
             export NEXTAUTH_SECRET="Kmo08F5rO40134hP0OFo8BZmqdzIliiSLiJdw/SlzyU="
             export NEXTAUTH_URL="https://ealaany.com"
             npm run build
+
+            # Restart or start the application with PM2
             pm2 restart nextjs-app || pm2 start npm --name "nextjs-app" -- start
             pm2 save
             echo "✅ Deployment completed successfully!"
