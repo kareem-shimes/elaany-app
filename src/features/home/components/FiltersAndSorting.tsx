@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SortAsc, MapPin, DollarSign, Star } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 
 export interface FilterOptions {
@@ -23,6 +23,23 @@ export interface SortOption {
   label: string;
   value: string;
   icon?: React.ReactNode;
+}
+
+interface SearchParams {
+  page?: string;
+  category?: string;
+  subcategory?: string;
+  location?: string | string[];
+  country?: string | string[];
+  query?: string;
+  minPrice?: string;
+  maxPrice?: string;
+  condition?: string;
+  sortBy?: string;
+}
+
+interface FiltersAndSortingProps {
+  searchParams: SearchParams;
 }
 
 const sortOptions: SortOption[] = [
@@ -60,7 +77,7 @@ const priceRanges = [
   { label: "أكثر من 10000 ر.س", min: 10000, max: undefined },
 ];
 
-const countries = {
+const countriesData = {
   السعودية: [
     "الرياض",
     "جدة",
@@ -91,16 +108,30 @@ const countries = {
   عمان: ["مسقط", "صلالة", "نزوى", "صحار", "الرستاق", "صور"],
 };
 
-export default function FiltersAndSorting() {
+export default function FiltersAndSorting({
+  searchParams,
+}: FiltersAndSortingProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
-  // Get current values from URL
-  const currentSort = searchParams.get("sortBy") || "auto";
-  const currentLocations = searchParams.getAll("location");
-  const currentCountries = searchParams.getAll("country");
-  const currentMinPrice = searchParams.get("minPrice");
-  const currentMaxPrice = searchParams.get("maxPrice");
+  // Handle multiple locations and countries from searchParams
+  const locations = Array.isArray(searchParams.location)
+    ? searchParams.location
+    : searchParams.location
+    ? [searchParams.location]
+    : [];
+
+  const countries = Array.isArray(searchParams.country)
+    ? searchParams.country
+    : searchParams.country
+    ? [searchParams.country]
+    : [];
+
+  // Get current values from searchParams
+  const currentSort = searchParams.sortBy || "auto";
+  const currentLocations = locations;
+  const currentCountries = countries;
+  const currentMinPrice = searchParams.minPrice;
+  const currentMaxPrice = searchParams.maxPrice;
 
   const selectedSortOption = sortOptions.find(
     (option) => option.value === currentSort
@@ -115,8 +146,20 @@ export default function FiltersAndSorting() {
   // Helper function to update URL search params
   const updateSearchParams = useCallback(
     (updates: Record<string, string | string[] | null>) => {
-      const params = new URLSearchParams(searchParams.toString());
+      const params = new URLSearchParams();
 
+      // Start with current searchParams
+      Object.entries(searchParams).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== "") {
+          if (Array.isArray(value)) {
+            value.forEach((v) => params.append(key, v));
+          } else {
+            params.set(key, value);
+          }
+        }
+      });
+
+      // Apply updates
       Object.entries(updates).forEach(([key, value]) => {
         if (value === null || value === undefined || value === "") {
           params.delete(key);
@@ -190,7 +233,12 @@ export default function FiltersAndSorting() {
   };
 
   const handleSortChange = (sortValue: string) => {
-    updateSearchParams({ sortBy: sortValue });
+    // If sorting by "auto" (default), remove the sortBy parameter entirely
+    if (sortValue === "auto") {
+      updateSearchParams({ sortBy: null });
+    } else {
+      updateSearchParams({ sortBy: sortValue });
+    }
   };
 
   const handleClearFilters = () => {
@@ -235,9 +283,12 @@ export default function FiltersAndSorting() {
       return []; // Don't show cities if no country selected or "كل المناطق" is selected
     }
     let cities: string[] = [];
-    currentCountries.forEach((country) => {
-      if (countries[country as keyof typeof countries]) {
-        cities = [...cities, ...countries[country as keyof typeof countries]];
+    currentCountries.forEach((country: string) => {
+      if (countriesData[country as keyof typeof countriesData]) {
+        cities = [
+          ...cities,
+          ...countriesData[country as keyof typeof countriesData],
+        ];
       }
     });
     return [...new Set(cities)]; // Remove duplicates
@@ -281,7 +332,7 @@ export default function FiltersAndSorting() {
                       <span className="ml-auto">✓</span>
                     )}
                   </DropdownMenuItem>
-                  {Object.keys(countries).map((country) => (
+                  {Object.keys(countriesData).map((country) => (
                     <DropdownMenuItem
                       key={country}
                       onClick={() => handleCountryToggle(country)}

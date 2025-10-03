@@ -25,11 +25,13 @@ export interface Ad {
   price: number;
   currency: string;
   location: string;
-  category: string;
-  subcategory?: string;
+  categoryId: string;
+  subcategoryId?: string;
+  category: string; // category slug
+  subcategory?: string; // subcategory slug
   image?: string;
   images?: string[];
-  postedDate: string;
+  postedDate: string | Date;
   seller: string;
   sellerImage?: string;
   sellerId: string;
@@ -38,6 +40,9 @@ export interface Ad {
   views?: number;
   isNegotiable?: boolean;
   phone?: string;
+  status?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface Filter {
