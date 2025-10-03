@@ -51,6 +51,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Generate Prisma client
+        run: npx prisma generate
+
       - name: Build application
         run: npm run build
         env:
@@ -116,6 +119,10 @@ jobs:
 
             # Install dependencies and build
             npm ci
+
+            # Generate Prisma client
+            npx prisma generate
+
             export NEXTAUTH_SECRET="Kmo08F5rO40134hP0OFo8BZmqdzIliiSLiJdw/SlzyU="
             export NEXTAUTH_URL="https://ealaany.com"
             npm run build

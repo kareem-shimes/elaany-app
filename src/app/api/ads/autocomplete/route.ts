@@ -1,6 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+// Type for the Prisma query result
+type AdWithRelations = {
+  id: number;
+  title: string;
+  description: string;
+  price: number;
+  currency: string;
+  location: string;
+  categoryId: string;
+  subcategoryId: string | null;
+  image: string | null;
+  images: string[];
+  createdAt: Date;
+  sellerId: string;
+  featured: boolean;
+  condition: string;
+  views: number;
+  isNegotiable: boolean;
+  phone: string | null;
+  status: string;
+  updatedAt: Date;
+  seller: {
+    id: string;
+    name: string | null;
+    image: string | null;
+  };
+  category: {
+    name: string;
+    slug: string;
+  };
+  subcategory: {
+    name: string;
+    slug: string;
+  } | null;
+};
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -143,7 +179,7 @@ export async function GET(request: NextRequest) {
     );
 
     // Transform ads data
-    const transformedAds = recentAds.map((ad) => ({
+    const transformedAds = recentAds.map((ad: AdWithRelations) => ({
       id: ad.id,
       title: ad.title,
       description: ad.description,
